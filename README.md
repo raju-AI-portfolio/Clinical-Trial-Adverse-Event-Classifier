@@ -258,15 +258,14 @@ ROI = (2,500,000 / 500,000) × 100
 
 ---
 
-# 8️⃣ Executive Messaging (Leadership-Ready Narrative)
+# 8️⃣ Executive Message
 
-### Key Positioning
 
 > "Even with conservative assumptions and mandatory human review, the AE classifier delivers payback within the first year, reduces safety risk, and scales across the entire trial portfolio. The largest value driver is earlier signal detection and improved inspection readiness — not just labor reduction."
 
 ---
 
-## Emphasize
+## Key Consideration
 
 - Conservative assumptions
 - Compliance-first design
