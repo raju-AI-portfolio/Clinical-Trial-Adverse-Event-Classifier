@@ -388,33 +388,6 @@ API Output + Dashboard
 
 ---
 
-# 📁 Project Structure
-
-
-ae-classifier/
-│
-├── data/
-│ ├── raw/
-│ ├── processed/
-│
-├── models/
-│ ├── bert_classifier.py
-│ ├── training.py
-│
-├── api/
-│ ├── main.py
-│
-├── frontend/
-│ ├── app.py
-│
-├── utils/
-│ ├── preprocessing.py
-│ ├── evaluation.py
-│
-├── requirements.txt
-└── README.md
-
-
 ---
 
 # 📊 Model Development Framework
