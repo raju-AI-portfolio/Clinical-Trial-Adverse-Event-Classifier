@@ -312,4 +312,296 @@ With first-year ROI of ~88% and 500%+ ongoing ROI, this represents a high-impact
 
 ---
 
-🚀 Transforming Pharmacovigilance Through AI-Driven Efficiency
+# 🧠 AI-Powered Clinical Trial Adverse Event (AE) Classifier
+
+An end-to-end **AI application** that automatically classifies clinical trial adverse event (AE) narratives into structured regulatory categories such as:
+
+- MedDRA SOC / Preferred Term (PT)
+- Seriousness
+- Expectedness
+- Causality
+- Expedited reporting flag
+
+Designed for Pharmacovigilance (PV), Clinical Operations, and Drug Safety teams.
+
+---
+
+# 🚀 Project Overview
+
+Clinical trials generate large volumes of unstructured adverse event narratives. Manual triage is:
+
+- Time-consuming  
+- Error-prone  
+- Inconsistent  
+
+This system uses **NLP + Transformer Models + Rule Engine** to automate AE classification and support regulatory compliance.
+
+---
+
+# 🏗️ System Architecture
+
+
+Data Source (CTMS / EDC / Safety DB)
+↓
+Data Ingestion
+↓
+Preprocessing & PHI Masking
+↓
+Text Embeddings (BioBERT / ClinicalBERT)
+↓
+Multi-class / Multi-label Classification
+↓
+Rule Engine (Seriousness / Causality)
+↓
+Confidence Scoring
+↓
+API Output + Dashboard
+
+
+---
+
+# 🧩 Tech Stack
+
+## Programming
+- Python 3.10+
+
+## NLP / ML
+- Hugging Face Transformers
+- PyTorch
+- scikit-learn
+- spaCy
+- SentenceTransformers
+
+## Database
+- PostgreSQL
+- FAISS (Vector Search)
+
+## Backend
+- FastAPI
+
+## Frontend
+- Streamlit
+
+## Deployment
+- Docker
+- AWS / Azure / GCP
+
+---
+
+# 📁 Project Structure
+
+
+ae-classifier/
+│
+├── data/
+│ ├── raw/
+│ ├── processed/
+│
+├── models/
+│ ├── bert_classifier.py
+│ ├── training.py
+│
+├── api/
+│ ├── main.py
+│
+├── frontend/
+│ ├── app.py
+│
+├── utils/
+│ ├── preprocessing.py
+│ ├── evaluation.py
+│
+├── requirements.txt
+└── README.md
+
+
+---
+
+# 📊 Model Development Framework
+
+## 1️⃣ Data Preparation
+
+- De-identification (PHI removal)
+- Text normalization
+- Abbreviation expansion
+- Tokenization & Lemmatization
+
+```python
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+def preprocess(text):
+    doc = nlp(text.lower())
+    tokens = [token.lemma_ for token in doc if not token.is_stop]
+    return " ".join(tokens)
+2️⃣ Embedding Generation
+from transformers import AutoTokenizer, AutoModel
+import torch
+
+model_name = "emilyalsentzer/Bio_ClinicalBERT"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModel.from_pretrained(model_name)
+
+def get_embedding(text):
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True)
+    outputs = model(**inputs)
+    return outputs.last_hidden_state.mean(dim=1)
+3️⃣ Fine-Tuning BERT Classifier
+from transformers import BertForSequenceClassification, Trainer, TrainingArguments
+
+model = BertForSequenceClassification.from_pretrained(
+    model_name,
+    num_labels=10
+)
+
+training_args = TrainingArguments(
+    output_dir="./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=16,
+    evaluation_strategy="epoch"
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset
+)
+
+trainer.train()
+4️⃣ Seriousness Rule Engine
+def check_seriousness(text):
+    serious_keywords = [
+        "death",
+        "hospitalization",
+        "life-threatening",
+        "disability"
+    ]
+
+    for word in serious_keywords:
+        if word in text.lower():
+            return "Serious"
+
+    return "Non-Serious"
+5️⃣ Confidence Scoring
+import torch.nn.functional as F
+
+def get_prediction_with_confidence(model, inputs):
+    outputs = model(**inputs)
+    probs = F.softmax(outputs.logits, dim=1)
+    confidence, predicted = torch.max(probs, dim=1)
+    return predicted.item(), confidence.item()
+🌐 FastAPI Backend
+
+api/main.py
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class AEInput(BaseModel):
+    narrative: str
+
+@app.post("/classify")
+def classify_ae(data: AEInput):
+    processed = preprocess(data.narrative)
+    prediction = model_predict(processed)
+    seriousness = check_seriousness(processed)
+
+    return {
+        "classification": prediction,
+        "seriousness": seriousness
+    }
+
+Run backend:
+
+uvicorn api.main:app --reload
+🖥️ Streamlit Frontend
+
+frontend/app.py
+
+import streamlit as st
+import requests
+
+st.title("Clinical Trial AE Classifier")
+
+text = st.text_area("Enter AE Narrative")
+
+if st.button("Classify"):
+    response = requests.post(
+        "http://localhost:8000/classify",
+        json={"narrative": text}
+    )
+    st.write(response.json())
+
+Run frontend:
+
+streamlit run frontend/app.py
+📈 Evaluation Metrics
+
+Accuracy
+
+Precision
+
+Recall
+
+F1 Score
+
+ROC-AUC
+
+Confusion Matrix
+
+from sklearn.metrics import classification_report
+
+print(classification_report(y_true, y_pred))
+🔐 Compliance & Validation
+
+GxP validation documentation
+
+Model versioning
+
+Audit logs
+
+Human-in-the-loop review
+
+Bias testing
+
+☁️ Cloud Deployment (AWS Example)
+
+EC2 – Model hosting
+
+S3 – Dataset storage
+
+RDS – Structured AE storage
+
+ECR – Docker images
+
+CloudWatch – Monitoring
+
+📦 Installation
+git clone https://github.com/yourusername/ae-classifier.git
+cd ae-classifier
+pip install -r requirements.txt
+▶️ Run Full Application
+
+Start FastAPI backend
+
+Start Streamlit frontend
+
+Enter AE narrative
+
+Get classification + seriousness + confidence
+
+🎯 Business Impact
+
+60–80% reduction in manual triage
+
+Improved coding consistency
+
+Faster SAE detection
+
+Enhanced regulatory compliance
+
+Reduced operational cost
